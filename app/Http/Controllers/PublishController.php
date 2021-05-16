@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Topic;
 use App\Services\TopicService;
+use App\Services\SubscribeService;
 use App\Http\Requests\PublishRequest;
+use App\Http\Resources\PublishResource;
 
 class PublishController extends Controller
 {
     private $topicService;
 
-    public function __construct(TopicService $topic)
+    private $subscribeService;
+
+    public function __construct(TopicService $topic, SubscribeService $subscribers)
     {
         $this->topicService = $topic;
+        $this->subscribeService = $subscribers;
     }
     /**
      * Display a listing of the resource.
@@ -43,11 +48,19 @@ class PublishController extends Controller
     public function store(PublishRequest $request, string $topic)
     {
         $data = $request->all();
-        if($post = $this->topicService->create($topic, $data)){
+        if(!is_null($this->topicService->find($topic))){
+            $post = $this->topicService->find($topic);
+            $this->topicService->update($post, $data, $topic);
+        }else{
+            $post = $this->topicService->create($topic, $data);
+        }
+        if($this->subscribeService->subscribe($post)){
+            return response()->json(new PublishResource($post), 201);
+        }else{
             return response()->json([
-                'success' => true,
-                'data' => $post
-            ], 201);
+                'success' => false,
+                'message' => 'operation could not be completed at the moment, please tr again.',
+            ], 500);
         }
     }
 

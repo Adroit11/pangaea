@@ -7,13 +7,13 @@ use App\Models\Topic;
 class TopicService
 {
     /**
-     * Get the topic by ID
+     * Get the topic by name
      *
      * @var Topic 
      */
-    public function find($id) : Topic
+    public function find($topic) : Topic
     {
-        return Topic::findOrFail($id);
+        return Topic::ofTopic($topic)->first();
     }
 
     /**

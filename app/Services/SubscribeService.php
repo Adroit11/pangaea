@@ -6,6 +6,10 @@ use App\Services\TopicService;
 
 use App\Models\Subscriber;
 
+use App\Jobs\SendNotification;
+
+use App\Models\Topic;
+
 class SubscribeService
 {
     private $topicService;
@@ -17,7 +21,7 @@ class SubscribeService
     /**
      * Get the Subscriber by URL
      *
-     * @var User 
+     * @var Subscriber 
      */
     public function find($url) : Subscriber
     {
@@ -27,7 +31,7 @@ class SubscribeService
     /**
      * Create a new subscriber's account
      *
-     * @var boolean
+     * @var Subscriber
      */
     public function create(array $data) : Subscriber
     {
@@ -39,7 +43,7 @@ class SubscribeService
     /**
      * Update a Subscriber
      *
-     * @var boolean
+     * @var Subscriber
      */
     public function update(Subscriber $subscriber, array $data) : Subscriber
     {
@@ -47,6 +51,18 @@ class SubscribeService
         $subscriber->topic_id = array_key_exists("topic", $data )? $this->topicService->get($data['topic']) : $subscriber->topic_id;
         $subscriber->save();
         return $subscriber;
+    }
+
+    /**
+     * Get topic subscribers and dispatch request to them all
+     */
+    public function subscribe(Topic $post) : bool
+    {
+        $subscribers = $post->subscribers;
+        foreach($subscribers as $subscriber){
+            SendNotification::dispatch($subscriber, $post);
+        }
+        return true;
     }
 
 }

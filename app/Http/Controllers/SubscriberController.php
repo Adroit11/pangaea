@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Subscriber;
 use App\Services\SubscribeService;
 use App\Http\Requests\SubscriberRequest;
+use App\Http\Resources\SubscribeResource;
 
 class SubscriberController extends Controller
 {
@@ -44,11 +45,8 @@ class SubscriberController extends Controller
     {
         $data = $request->all();
         $data['topic'] = $topic;
-        if($this->subscribeService->create($data)){
-            return response()->json([
-                'success' => true,
-                'data' => $data
-            ], 201);
+        if($subscribe = $this->subscribeService->create($data)){
+            return response()->json(new SubscribeResource($subscribe), 201);
         }else{
             return response()->json([
                 'success' => false,
