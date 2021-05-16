@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use TopicService;
+use App\Services\TopicService;
 
 use App\Models\Subscriber;
 

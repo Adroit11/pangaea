@@ -21,9 +21,9 @@ class TopicService
      *
      * @var ID 
      */
-    public function get($topic) : integer
+    public function get($topic) : int
     {
-        return Topic::WhereTopic($topic)->pluck('id')->first();
+        return Topic::ofTopic($topic)->pluck('id')->first();
     }
 
     /**
@@ -31,11 +31,11 @@ class TopicService
      *
      * @var boolean
      */
-    public function create(array $data) : Topic
+    public function create(string $topic, array $data) : Topic
     {
-        $topic = new Topic();
+        $post = new Topic();
 
-        return $this->update($topic, $data);
+        return $this->update($post, $data, $topic);
     }
 
     /**
@@ -43,12 +43,12 @@ class TopicService
      *
      * @var boolean
      */
-    public function update(Topic $topic, array $data) : Topic
+    public function update(Topic $post, array $data, string $topic) : Topic
     {
-        $topic->topic = array_key_exists("topic", $data )? $data['topic'] : $topic->topic;
-        $topic->body = array_key_exists("data", $data )? $data['data'] : $topic->body;
-        $topic->save();
-        return $topic;
+        $post->topic = isset($topic)? $topic : $post->topic;
+        $post->body = isset($data)? $data : $post->body;
+        $post->save();
+        return $post;
     }
 
 }
